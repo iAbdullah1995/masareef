@@ -231,6 +231,39 @@
   .toast.show{opacity:1;transform:translateX(50%) translateY(0)}
 
   .count-badge{font-size:11.5px;color:var(--muted);background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+
+  /* tabs / screens + bottom nav */
+  .screen{display:none}
+  .screen.active{display:block}
+  .bottom-nav{position:fixed;bottom:0;right:0;left:0;background:var(--card);border-top:1px solid var(--line);display:flex;z-index:40;padding-bottom:env(safe-area-inset-bottom)}
+  .nav-item{flex:1;background:none;border:none;padding:9px 4px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-family:inherit}
+  .nav-item.active{color:var(--accent)}
+  .nav-item svg{width:22px;height:22px}
+  .nav-item span{font-size:10.5px;font-weight:500}
+  .screen-head{padding:16px 16px 4px;max-width:640px;margin:0 auto}
+  .screen-head h2{font-size:20px;font-weight:700}
+  .screen-head .sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+
+  /* accounts */
+  .acc-card{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+  .acc-card:last-child{border-bottom:none}
+  .acc-card:active{background:var(--paper)}
+  .acc-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:18px}
+  .ai-current{background:var(--transfer-bg)} .ai-credit{background:var(--expense-bg)}
+  .ai-wallet{background:#f0eaf6} .ai-cash{background:var(--income-bg)}
+  .acc-mid{flex:1;min-width:0}
+  .acc-name{font-size:14.5px;font-weight:600}
+  .acc-meta{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .acc-bal{text-align:left;white-space:nowrap}
+  .acc-bal .v{font-size:15px;font-weight:700}
+  .acc-bal .l{font-size:10px;color:var(--muted)}
+  .acc-credit-bar{height:4px;background:var(--line);border-radius:3px;margin-top:5px;overflow:hidden;width:80px}
+  .acc-credit-bar i{display:block;height:100%;background:var(--expense)}
+  .kind-seg{display:flex;gap:6px;flex-wrap:wrap}
+  .kind-opt{flex:1;min-width:70px;border:1px solid var(--line);border-radius:9px;padding:9px 6px;text-align:center;font-size:12.5px;cursor:pointer;background:#fff;color:var(--muted)}
+  .kind-opt.sel{border-color:var(--accent);background:#f0eaf6;color:var(--accent);font-weight:600}
+  .credit-only{display:none}
+  .credit-only.show{display:flex}
 </style>
 </head>
 <body>
@@ -242,6 +275,9 @@
 </header>
 
 <div class="wrap">
+
+<!-- ===== SCREEN: HOME ===== -->
+<div class="screen active" id="screen-home">
 
   <!-- INPUT PANEL -->
   <div class="panel">
@@ -361,7 +397,41 @@
     </div>
   </div>
 
-</div>
+</div><!-- /screen-home -->
+
+<!-- ===== SCREEN: ACCOUNTS ===== -->
+<div class="screen" id="screen-accounts">
+  <div class="screen-head">
+    <h2>الحسابات</h2>
+    <div class="sub">حساباتك وأرصدتها — عرّفها برصيد افتتاحي وتاريخه</div>
+  </div>
+  <div class="panel" style="margin-top:12px">
+    <div class="panel-h">
+      <h2>حساباتي</h2>
+      <button class="btn cust-add-btn" id="accAddBtn" type="button" style="background:var(--transfer-bg);color:var(--transfer);border-color:#bcd4ee">+ حساب جديد</button>
+    </div>
+    <div class="panel-b" style="padding:0"><div id="accList"></div></div>
+  </div>
+</div><!-- /screen-accounts -->
+
+<!-- ===== SCREEN: SETTINGS ===== -->
+<div class="screen" id="screen-settings">
+  <div class="screen-head">
+    <h2>الإعدادات</h2>
+    <div class="sub">النسخ الاحتياطي والبيانات</div>
+  </div>
+  <div class="panel" style="margin-top:12px">
+    <div class="panel-h"><h2>البيانات</h2></div>
+    <div class="panel-b" style="display:flex;flex-direction:column;gap:9px">
+      <button class="btn btn-ghost" id="exportBtn2">تصدير Excel (CSV)</button>
+      <button class="btn btn-ghost" id="backupBtn2">💾 نسخة احتياطية (JSON)</button>
+      <button class="btn btn-ghost" id="restoreBtn2">📂 استيراد نسخة</button>
+      <button class="btn btn-ghost" id="testBtn2" style="font-size:12px">تشغيل نماذج الاختبار</button>
+    </div>
+  </div>
+</div><!-- /screen-settings -->
+
+</div><!-- /wrap -->
 
 <!-- CUSTODY RECEIVE MODAL -->
 <div class="modal-back" id="custModal">
@@ -421,19 +491,82 @@
 
 <div class="backup-banner" id="backupBanner"></div>
 
-<div class="toolbar">
-  <button class="btn btn-ghost" id="exportBtn">تصدير Excel (CSV)</button>
-  <button class="btn btn-ghost" id="backupBtn">💾 نسخة احتياطية</button>
-  <button class="btn btn-ghost" id="restoreBtn">📂 استيراد</button>
-</div>
-<div class="toolbar" style="padding-top:0">
-  <button class="btn btn-ghost" id="testBtn" style="flex:1;font-size:12px">تشغيل نماذج الاختبار</button>
-</div>
 <input type="file" id="restoreFile" accept="application/json,.json" style="display:none">
 
 <footer style="text-align:center;padding:18px 14px 8px;color:var(--muted);font-size:11.5px">
-  مصاريف · الإصدار 0.3.0 <span style="opacity:.5">— المرحلة ٣-أ: قلب الذمم</span>
+  مصاريف · الإصدار 0.4.0 <span style="opacity:.5">— تبويبات + الحسابات</span>
 </footer>
+
+<!-- ACCOUNT MODAL -->
+<div class="modal-back" id="accModal">
+  <div class="modal">
+    <div class="modal-h">
+      <h3 id="accModalTitle">حساب جديد</h3>
+      <button class="modal-x" id="accClose" type="button">×</button>
+    </div>
+    <div class="modal-b">
+      <div class="fld full">
+        <label>نوع الحساب</label>
+        <div class="kind-seg" id="accKindSeg">
+          <div class="kind-opt sel" data-kind="current">🏦 جاري</div>
+          <div class="kind-opt" data-kind="credit">💳 ائتمانية</div>
+          <div class="kind-opt" data-kind="wallet">📱 محفظة</div>
+          <div class="kind-opt" data-kind="cash">💵 نقد</div>
+        </div>
+      </div>
+      <div class="fld full">
+        <label>اسم الحساب</label>
+        <input id="accName" placeholder="مثال: الراجحي الجاري">
+      </div>
+      <div class="fld full" id="accLast4Wrap">
+        <label>آخر 4 أرقام</label>
+        <input id="accLast4" placeholder="مثال: 8401" maxlength="4" inputmode="numeric">
+      </div>
+
+      <!-- credit-only: limit + available -->
+      <div class="cust-split credit-only" id="accCreditBox">
+        <div class="cust-split-head">بيانات البطاقة الائتمانية</div>
+        <div class="cust-split-row">
+          <div class="fld"><label>حد البطاقة</label><input id="accLimit" type="number" step="0.01" class="yellow"></div>
+          <div class="fld"><label>المتاح حالياً</label><input id="accAvail" type="number" step="0.01" class="yellow"></div>
+        </div>
+        <div class="cust-balance ok" id="accOutstanding"><span>المستحق عليك (محسوب)</span><b class="amount" id="accOutVal">0.00</b></div>
+      </div>
+
+      <!-- non-credit opening balance -->
+      <div class="fld full" id="accOpenWrap">
+        <label>الرصيد الافتتاحي</label>
+        <input id="accOpening" type="number" step="0.01" class="yellow" placeholder="0.00">
+      </div>
+
+      <div class="fld full">
+        <label>تاريخ الرصيد الافتتاحي ⚠️ إلزامي</label>
+        <input id="accOpenDate" type="date">
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-ghost" id="accDelete" type="button" style="color:var(--expense);display:none">حذف</button>
+      <button class="btn btn-ghost" id="accCancel" type="button">إلغاء</button>
+      <button class="btn btn-primary" id="accSave" type="button">حفظ الحساب</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item active" data-screen="home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+    <span>الرئيسية</span>
+  </button>
+  <button class="nav-item" data-screen="accounts">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+    <span>الحسابات</span>
+  </button>
+  <button class="nav-item" data-screen="settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+    <span>الإعدادات</span>
+  </button>
+</nav>
 
 <div class="toast" id="toast"></div>
 
@@ -570,6 +703,11 @@ let current=null;
 let TAG_STORE=["زوجتي","أنا","المنزل","الأطفال"]; // shared, reused; grows as user adds
 let curTags=[];   // tags on the transaction being edited
 let PARTIES=[];    // named custody counterparties: ["أبي","صديق فلان",...]
+let ACCOUNTS=[];   // user's own money accounts
+/* Each account: {id, name, kind:'current'|'credit'|'wallet'|'cash',
+   last4 (''for cash), openingBalance, openingDate,
+   creditLimit (credit only)}. For credit cards openingBalance holds the
+   AVAILABLE amount; outstanding = creditLimit - available. */
 /* Custody movements are stored inside `ledger` with type:'custody'.
    Each has: {type:'custody', party, custodyKind:'receive'|'spend',
    amount, toLiability, toIncome, date, note}. They are ISOLATED from
@@ -594,6 +732,7 @@ function saveState(){
       ledger,
       tags:TAG_STORE,
       parties:PARTIES,
+      accounts:ACCOUNTS,
       categories:CATEGORIES
     };
     localStorage.setItem(STORAGE_KEY,JSON.stringify(payload));
@@ -612,6 +751,7 @@ function applyPayload(p){
   if(Array.isArray(p.ledger))ledger=p.ledger;
   if(Array.isArray(p.tags))TAG_STORE=p.tags;
   if(Array.isArray(p.parties))PARTIES=p.parties;
+  if(Array.isArray(p.accounts))ACCOUNTS=p.accounts;
   if(p.categories&&typeof p.categories==="object"){
     // merge saved categories into the live object (keep reference used elsewhere)
     Object.keys(CATEGORIES).forEach(k=>delete CATEGORIES[k]);
@@ -1077,6 +1217,125 @@ function openStatement(party){
 }
 function closeStatement(){$('stmtModal').className='modal-back';}
 
+/* ============================================================
+   TAB NAVIGATION
+   ============================================================ */
+function switchScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const sc=$('screen-'+name); if(sc)sc.classList.add('active');
+  document.querySelector('.nav-item[data-screen="'+name+'"]')?.classList.add('active');
+  if(name==='accounts')renderAccounts();
+  window.scrollTo({top:0});
+}
+
+/* ============================================================
+   ACCOUNTS (Phase: accounts management)
+   ============================================================ */
+const KIND_AR={current:'جاري',credit:'ائتمانية',wallet:'محفظة رقمية',cash:'نقد'};
+const KIND_ICON={current:'🏦',credit:'💳',wallet:'📱',cash:'💵'};
+let accEditId=null;
+let accKind='current';
+
+function renderAccounts(){
+  const box=$('accList');
+  if(!ACCOUNTS.length){box.innerHTML='<div class="cust-empty">لا توجد حسابات بعد.<br>اضغط «+ حساب جديد» لتعريف حساباتك وأرصدتها الافتتاحية.</div>';return;}
+  box.innerHTML='';
+  ACCOUNTS.forEach(a=>{
+    const row=document.createElement('div');row.className='acc-card';
+    let balHtml='';
+    if(a.kind==='credit'){
+      const limit=parseFloat(a.creditLimit)||0;
+      const avail=parseFloat(a.openingBalance)||0;
+      const out=Math.round((limit-avail)*100)/100;
+      const pct=limit>0?Math.min(100,Math.round(out/limit*100)):0;
+      balHtml=`<div class="acc-bal"><div class="v" style="color:var(--expense)">${fmt(out)}</div><div class="l">مستحق · متاح ${fmt(avail)}</div><div class="acc-credit-bar"><i style="width:${pct}%"></i></div></div>`;
+    }else{
+      balHtml=`<div class="acc-bal"><div class="v">${fmt(parseFloat(a.openingBalance)||0)}</div><div class="l">افتتاحي · ${a.openingDate||'—'}</div></div>`;
+    }
+    row.innerHTML=`
+      <div class="acc-icon ai-${a.kind}">${KIND_ICON[a.kind]}</div>
+      <div class="acc-mid">
+        <div class="acc-name">${a.name}</div>
+        <div class="acc-meta">${KIND_AR[a.kind]}${a.last4?(' · •'+a.last4):''}</div>
+      </div>
+      ${balHtml}`;
+    row.onclick=()=>openAccModal(a.id);
+    box.appendChild(row);
+  });
+}
+
+function setAccKind(k){
+  accKind=k;
+  document.querySelectorAll('#accKindSeg .kind-opt').forEach(o=>o.classList.toggle('sel',o.dataset.kind===k));
+  // credit fields vs normal opening balance
+  $('accCreditBox').className='cust-split credit-only'+(k==='credit'?' show':'');
+  $('accOpenWrap').style.display=(k==='credit')?'none':'block';
+  // cash has no last4
+  $('accLast4Wrap').style.display=(k==='cash')?'none':'block';
+  updateAccOutstanding();
+}
+function updateAccOutstanding(){
+  const limit=parseFloat($('accLimit').value)||0;
+  const avail=parseFloat($('accAvail').value)||0;
+  const out=Math.round((limit-avail)*100)/100;
+  $('accOutVal').textContent=fmt(out);
+  $('accOutstanding').className='cust-balance '+(out>=0?'ok':'off');
+}
+function openAccModal(id){
+  accEditId=id||null;
+  $('accModalTitle').textContent=id?'تعديل حساب':'حساب جديد';
+  $('accDelete').style.display=id?'block':'none';
+  if(id){
+    const a=ACCOUNTS.find(x=>x.id===id);
+    setAccKind(a.kind);
+    $('accName').value=a.name||'';
+    $('accLast4').value=a.last4||'';
+    $('accOpenDate').value=a.openingDate||'';
+    if(a.kind==='credit'){$('accLimit').value=a.creditLimit||'';$('accAvail').value=a.openingBalance||'';updateAccOutstanding();}
+    else{$('accOpening').value=a.openingBalance||'';}
+  }else{
+    setAccKind('current');
+    $('accName').value='';$('accLast4').value='';$('accOpening').value='';$('accLimit').value='';$('accAvail').value='';
+    $('accOpenDate').value=new Date().toISOString().slice(0,10);
+  }
+  $('accModal').className='modal-back show';
+}
+function closeAccModal(){$('accModal').className='modal-back';accEditId=null;}
+function saveAccount(){
+  const name=$('accName').value.trim();
+  if(!name){toast('أدخل اسم الحساب');return;}
+  const openDate=$('accOpenDate').value;
+  if(!openDate){toast('تاريخ الرصيد الافتتاحي إلزامي');return;}
+  const last4=(accKind==='cash')?'':$('accLast4').value.trim();
+  let rec;
+  if(accKind==='credit'){
+    const limit=parseFloat($('accLimit').value)||0;
+    const avail=parseFloat($('accAvail').value)||0;
+    if(limit<=0){toast('أدخل حد البطاقة');return;}
+    rec={kind:'credit',name,last4,creditLimit:limit,openingBalance:avail,openingDate:openDate};
+  }else{
+    rec={kind:accKind,name,last4,openingBalance:parseFloat($('accOpening').value)||0,openingDate:openDate};
+  }
+  if(accEditId){
+    const i=ACCOUNTS.findIndex(x=>x.id===accEditId);
+    rec.id=accEditId; ACCOUNTS[i]=rec;
+    toast('تم تحديث الحساب');
+  }else{
+    rec.id='a'+Date.now(); ACCOUNTS.push(rec);
+    toast('تم إضافة الحساب');
+  }
+  saveState();closeAccModal();renderAccounts();
+}
+function deleteAccount(){
+  if(!accEditId)return;
+  const a=ACCOUNTS.find(x=>x.id===accEditId);
+  if(!confirm('حذف حساب «'+a.name+'»؟ لن تُحذف عملياته، لكن يفقد تعريفه ورصيده الافتتاحي.'))return;
+  ACCOUNTS=ACCOUNTS.filter(x=>x.id!==accEditId);
+  saveState();closeAccModal();renderAccounts();
+  toast('تم حذف الحساب');
+}
+
 /* --- events --- */
 $('parseBtn').onclick=()=>{
   const txt=$('smsInput').value;
@@ -1115,6 +1374,26 @@ $('custParty').oninput=()=>renderPartySuggest($('custParty').value);
 $('stmtClose').onclick=closeStatement;
 $('custModal').onclick=e=>{if(e.target===$('custModal'))closeCustModal();};
 $('stmtModal').onclick=e=>{if(e.target===$('stmtModal'))closeStatement();};
+
+/* nav */
+document.querySelectorAll('.nav-item').forEach(n=>n.onclick=()=>switchScreen(n.dataset.screen));
+
+/* account modal */
+$('accAddBtn').onclick=()=>openAccModal(null);
+$('accClose').onclick=closeAccModal;
+$('accCancel').onclick=closeAccModal;
+$('accSave').onclick=saveAccount;
+$('accDelete').onclick=deleteAccount;
+$('accModal').onclick=e=>{if(e.target===$('accModal'))closeAccModal();};
+document.querySelectorAll('#accKindSeg .kind-opt').forEach(o=>o.onclick=()=>setAccKind(o.dataset.kind));
+$('accLimit').oninput=updateAccOutstanding;
+$('accAvail').oninput=updateAccOutstanding;
+
+/* relocated settings buttons (mirror originals) */
+$('exportBtn2').onclick=()=>doExport();
+$('backupBtn2').onclick=()=>doBackup();
+$('restoreBtn2').onclick=()=>$('restoreFile').click();
+$('testBtn2').onclick=()=>doTest();
 // auto-fill liability with the full amount when total entered and split still empty
 $('custTotal').addEventListener('change',()=>{
   if(!$('custLiab').value&&!$('custIncome').value){$('custLiab').value=$('custTotal').value;updateCustBalance();}
@@ -1159,27 +1438,26 @@ $('saveBtn').onclick=()=>{
   saveState();
 };
 
-$('exportBtn').onclick=()=>{
+function doExport(){
   if(!ledger.length){toast('لا توجد عمليات للتصدير');return;}
   const head=['التاريخ','نوع العملية','التصنيف الرئيسي','التصنيف الفرعي','الطرف','الحساب','المبلغ','الوسوم','مقسّمة','البنك'];
   const rows=ledger.filter(t=>!t.isParent&&t.type!=='custody').map(t=>[t.date,TYPE_AR[t.type],t.catMain,t.catSub,t.party,t.account,t.amount,(t.tags||[]).join(' | '),t.isChild?'بند':'',t.bank]);
   let csv='\uFEFF'+head.join(',')+'\n'+rows.map(r=>r.map(c=>`"${String(c==null?'':c).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='masareef.csv';a.click();
-  toast('تم تصدير '+ledger.length+' عملية');
-};
+  toast('تم تصدير '+rows.length+' عملية');
+}
 
 /* --- JSON backup (bridge across code updates) --- */
-$('backupBtn').onclick=()=>{
-  const payload={schema:SCHEMA,savedAt:new Date().toISOString(),ledger,tags:TAG_STORE,categories:CATEGORIES};
+function doBackup(){
+  const payload={schema:SCHEMA,savedAt:new Date().toISOString(),ledger,tags:TAG_STORE,parties:PARTIES,accounts:ACCOUNTS,categories:CATEGORIES};
   payload.lastBackup=payload.savedAt;
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const stamp=new Date().toISOString().slice(0,10);
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='masareef-backup-'+stamp+'.json';a.click();
   lastBackup=payload.lastBackup; saveState(); renderBackupBanner();
   toast('تم حفظ نسخة احتياطية — خزّنها في Files/iCloud');
-};
-$('restoreBtn').onclick=()=>$('restoreFile').click();
+}
 $('restoreFile').onchange=e=>{
   const file=e.target.files[0]; if(!file)return;
   const r=new FileReader();
@@ -1187,10 +1465,10 @@ $('restoreFile').onchange=e=>{
     try{
       const p=JSON.parse(r.result);
       if(!p||!Array.isArray(p.ledger))throw new Error('bad');
-      const n=p.ledger.filter(t=>!t.isParent).length;
+      const n=p.ledger.filter(t=>!t.isParent&&t.type!=='custody').length;
       if(!confirm('سيستبدل هذا كل البيانات الحالية بـ '+n+' عملية من الملف. متابعة؟')){$('restoreFile').value='';return;}
-      applyPayload(p); saveState(); renderLedger(); renderBackupBanner();
-      toast('تم استيراد '+n+' عملية بنجاح');
+      applyPayload(p); saveState(); renderLedger(); renderCustody(); renderAccounts(); renderBackupBanner();
+      toast('تم استيراد البيانات بنجاح');
     }catch(err){toast('ملف غير صالح — تأكد أنه نسخة احتياطية JSON');}
     $('restoreFile').value='';
   };
@@ -1207,7 +1485,7 @@ function renderBackupBanner(){
     const txt=lastBackup?('آخر نسخة احتياطية منذ '+Math.floor(d)+' يوماً.'):'لم تأخذ نسخة احتياطية بعد.';
     b.innerHTML='<div class="inner">⚠️ '+txt+' <b id="bnkNow">احفظ الآن</b></div>';
     b.className='backup-banner show';
-    $('bnkNow').onclick=()=>$('backupBtn').click();
+    $('bnkNow').onclick=()=>doBackup();
   }else{b.className='backup-banner';}
 }
 
@@ -1247,13 +1525,13 @@ Amount:SAR 3
 Balance:SAR 92808.12
 3/8/26 19:47`
 ];
-$('testBtn').onclick=()=>{
-  if(ledger.length&&!confirm('سيستبدل هذا بياناتك الحالية بنماذج الاختبار. متابعة؟'))return;
-  ledger=[];
+function doTest(){
+  if(ledger.some(t=>t.type!=='custody')&&!confirm('سيستبدل هذا بياناتك الحالية بنماذج الاختبار. متابعة؟'))return;
+  ledger=ledger.filter(t=>t.type==='custody'); // keep custody, replace ops
   SAMPLES.forEach(s=>{const p=parseSMS(s);ledger.push({type:p.type,catMain:p.catMain,catSub:p.catSub,party:p.party,account:p.account,amount:p.amount,date:p.date,balance:p.balance,bank:p.bank,raw:p.raw});});
   renderLedger();saveState();
   toast('تم تحميل '+SAMPLES.length+' نماذج اختبار');
-};
+}
 
 /* --- INIT: load saved data first, then render --- */
 loadState();
