@@ -2,7 +2,7 @@
    Caches the app shell so the tool opens offline.
    IMPORTANT: this caches CODE only. Your data lives in
    localStorage on your device and is never touched here. */
-const CACHE='masareef-v1';
+const CACHE='masareef-v2';   // ⬅️ زِد الرقم مع كل تحديث ترفعه (v3, v4…) ليجلب Safari النسخة الجديdة
 const ASSETS=['./','./index.html','./manifest.json','./icon-192.png','./icon-512.png','./icon-180.png'];
 
 self.addEventListener('install',e=>{
@@ -17,9 +17,19 @@ self.addEventListener('activate',e=>{
 });
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
+  const isDoc=e.request.mode==='navigate'||e.request.destination==='document';
+  if(isDoc){
+    // network-first for the page: get updates immediately, fall back to cache offline
+    e.respondWith(
+      fetch(e.request).then(res=>{
+        const copy=res.clone();caches.open(CACHE).then(c=>c.put(e.request,copy)).catch(()=>{});
+        return res;
+      }).catch(()=>caches.match(e.request).then(h=>h||caches.match('./index.html')))
+    );
+    return;
+  }
   e.respondWith(
     caches.match(e.request).then(hit=>hit||fetch(e.request).then(res=>{
-      // cache same-origin successful responses for next offline load
       if(res.ok&&e.request.url.startsWith(self.location.origin)){
         const copy=res.clone();caches.open(CACHE).then(c=>c.put(e.request,copy)).catch(()=>{});
       }
