@@ -154,6 +154,56 @@
   .row-child::before{content:'';position:absolute;right:20px;top:0;bottom:50%;width:1px;background:var(--line)}
   .row-child::after{content:'';position:absolute;right:20px;top:50%;width:8px;height:1px;background:var(--line)}
 
+  /* custody */
+  .cust-add-btn{background:var(--refund-bg);color:var(--refund);border:1px solid #e8d9a8;font-size:12.5px;padding:6px 12px}
+  .cust-party-row{display:flex;align-items:center;gap:11px;padding:13px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+  .cust-party-row:last-child{border-bottom:none}
+  .cust-party-row:active{background:var(--paper)}
+  .cust-ava{width:36px;height:36px;border-radius:10px;background:var(--refund-bg);color:var(--refund);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex:0 0 auto}
+  .cust-mid{flex:1;min-width:0}
+  .cust-name{font-size:14.5px;font-weight:600}
+  .cust-sub{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .cust-bal{text-align:left;white-space:nowrap}
+  .cust-bal .v{font-size:15px;font-weight:700}
+  .cust-bal .d{font-size:10.5px;font-weight:600;border-radius:5px;padding:1px 6px;margin-top:2px;display:inline-block}
+  .d-owe{color:var(--expense);background:var(--expense-bg)}
+  .d-owed{color:var(--income);background:var(--income-bg)}
+  .d-settled{color:var(--muted);background:var(--paper)}
+  .cust-empty{padding:26px 18px;text-align:center;color:var(--muted);font-size:13px}
+
+  /* modal */
+  .modal-back{position:fixed;inset:0;background:rgba(28,35,33,.45);z-index:60;display:none;align-items:flex-end;justify-content:center}
+  .modal-back.show{display:flex}
+  .modal{background:var(--card);width:100%;max-width:560px;border-radius:20px 20px 0 0;max-height:92vh;overflow-y:auto;animation:slideup .22s ease}
+  @keyframes slideup{from{transform:translateY(40px);opacity:.6}to{transform:translateY(0);opacity:1}}
+  .modal-h{position:sticky;top:0;background:var(--card);display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--line)}
+  .modal-h h3{font-size:16.5px;font-weight:700}
+  .modal-x{border:none;background:var(--paper);width:30px;height:30px;border-radius:50%;font-size:19px;color:var(--muted);cursor:pointer;line-height:1}
+  .modal-b{padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+  .modal-f{position:sticky;bottom:0;background:var(--card);display:flex;gap:9px;padding:12px 18px;border-top:1px solid var(--line)}
+  .modal-f .btn{flex:1}
+  .modal-f .btn-ghost{flex:0 0 auto}
+  .party-picker{position:relative}
+  .party-picker input{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-family:inherit;font-size:13.5px;background:#fff;color:var(--ink)}
+  .party-picker input:focus{outline:none;border-color:var(--accent)}
+  .party-suggest{position:absolute;top:100%;right:0;left:0;background:#fff;border:1px solid var(--line);border-radius:9px;box-shadow:var(--shadow);margin-top:4px;max-height:150px;overflow-y:auto;z-index:5;display:none}
+  .party-suggest.show{display:block}
+  .cust-split{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .cust-split-head{font-size:12.5px;color:var(--muted);margin-bottom:9px;font-weight:500}
+  .cust-split-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .cust-balance{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:8px 11px;border-radius:9px;font-size:13px;font-weight:600}
+  .cust-balance.ok{background:var(--income-bg);color:var(--income)}
+  .cust-balance.off{background:var(--expense-bg);color:var(--expense)}
+  /* statement */
+  .stmt-sum{background:var(--paper);border-radius:12px;padding:14px;text-align:center;margin-bottom:6px}
+  .stmt-sum .v{font-size:26px;font-weight:700}
+  .stmt-sum .d{font-size:12px;font-weight:600;border-radius:6px;padding:2px 9px;display:inline-block;margin-top:4px}
+  .stmt-mv{display:flex;align-items:center;justify-content:space-between;padding:11px 4px;border-bottom:1px solid var(--line);font-size:13px}
+  .stmt-mv:last-child{border-bottom:none}
+  .stmt-mv .mv-l{color:var(--muted);font-size:11.5px}
+  .stmt-mv .mv-plus{color:var(--expense);font-weight:600}
+  .stmt-mv .mv-minus{color:var(--income);font-weight:600}
+
   /* ledger */
   .empty{text-align:center;padding:34px 18px;color:var(--muted);font-size:13.5px}
   .empty svg{opacity:.4;margin-bottom:8px}
@@ -300,6 +350,73 @@
     </div>
   </div>
 
+  <!-- CUSTODY / RECEIVABLES -->
+  <div class="panel">
+    <div class="panel-h">
+      <h2>الذمم والعُهد</h2>
+      <button class="btn cust-add-btn" id="custAddBtn" type="button">+ استلام عهدة</button>
+    </div>
+    <div class="panel-b" style="padding:0">
+      <div id="custList"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CUSTODY RECEIVE MODAL -->
+<div class="modal-back" id="custModal">
+  <div class="modal">
+    <div class="modal-h">
+      <h3>استلام عهدة</h3>
+      <button class="modal-x" id="custClose" type="button">×</button>
+    </div>
+    <div class="modal-b">
+      <div class="fld full">
+        <label>الطرف (صاحب العهدة)</label>
+        <div class="party-picker">
+          <input id="custParty" placeholder="اختر أو أضف طرفاً…" autocomplete="off">
+          <div class="party-suggest" id="custPartySuggest"></div>
+        </div>
+      </div>
+      <div class="fld full">
+        <label>المبلغ المستلَم كاملاً</label>
+        <input id="custTotal" type="number" step="0.01" class="yellow" placeholder="0.00">
+      </div>
+
+      <div class="cust-split">
+        <div class="cust-split-head">توزيع المبلغ</div>
+        <div class="cust-split-row">
+          <div class="fld"><label>عهدة (التزام عليك) 🔒</label><input id="custLiab" type="number" step="0.01" class="yellow"></div>
+          <div class="fld"><label>دخل لك 💰</label><input id="custIncome" type="number" step="0.01"></div>
+        </div>
+        <div class="cust-balance" id="custBalance"><span>غير موزّع</span><b class="amount" id="custRemain">0.00</b></div>
+      </div>
+
+      <div class="fld full">
+        <label>التاريخ</label>
+        <input id="custDate" type="datetime-local">
+      </div>
+      <div class="fld full">
+        <label>ملاحظة (اختياري)</label>
+        <input id="custNote" placeholder="مثال: لشراء قطع غيار">
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-ghost" id="custCancel" type="button">إلغاء</button>
+      <button class="btn btn-primary" id="custSave" type="button">حفظ العهدة</button>
+    </div>
+  </div>
+</div>
+
+<!-- PARTY STATEMENT MODAL -->
+<div class="modal-back" id="stmtModal">
+  <div class="modal">
+    <div class="modal-h">
+      <h3 id="stmtTitle">كشف حساب</h3>
+      <button class="modal-x" id="stmtClose" type="button">×</button>
+    </div>
+    <div class="modal-b" id="stmtBody"></div>
+  </div>
 </div>
 
 <div class="backup-banner" id="backupBanner"></div>
@@ -313,6 +430,10 @@
   <button class="btn btn-ghost" id="testBtn" style="flex:1;font-size:12px">تشغيل نماذج الاختبار</button>
 </div>
 <input type="file" id="restoreFile" accept="application/json,.json" style="display:none">
+
+<footer style="text-align:center;padding:18px 14px 8px;color:var(--muted);font-size:11.5px">
+  مصاريف · الإصدار 0.3.0 <span style="opacity:.5">— المرحلة ٣-أ: قلب الذمم</span>
+</footer>
 
 <div class="toast" id="toast"></div>
 
@@ -448,6 +569,11 @@ let ledger=[];
 let current=null;
 let TAG_STORE=["زوجتي","أنا","المنزل","الأطفال"]; // shared, reused; grows as user adds
 let curTags=[];   // tags on the transaction being edited
+let PARTIES=[];    // named custody counterparties: ["أبي","صديق فلان",...]
+/* Custody movements are stored inside `ledger` with type:'custody'.
+   Each has: {type:'custody', party, custodyKind:'receive'|'spend',
+   amount, toLiability, toIncome, date, note}. They are ISOLATED from
+   bank balances and expense/income reports by that type flag. */
 
 /* ============================================================
    PERSISTENCE  —  code (this file) is separate from data.
@@ -467,6 +593,7 @@ function saveState(){
       lastBackup,
       ledger,
       tags:TAG_STORE,
+      parties:PARTIES,
       categories:CATEGORIES
     };
     localStorage.setItem(STORAGE_KEY,JSON.stringify(payload));
@@ -484,6 +611,7 @@ function applyPayload(p){
   if(!p||typeof p!=="object")return false;
   if(Array.isArray(p.ledger))ledger=p.ledger;
   if(Array.isArray(p.tags))TAG_STORE=p.tags;
+  if(Array.isArray(p.parties))PARTIES=p.parties;
   if(p.categories&&typeof p.categories==="object"){
     // merge saved categories into the live object (keep reference used elsewhere)
     Object.keys(CATEGORIES).forEach(k=>delete CATEGORIES[k]);
@@ -498,6 +626,46 @@ const TYPE_AR={expense:"مصروف",income:"دخل",transfer:"تحويل",refund
 const TYPE_CLS={expense:"expense",income:"income",transfer:"transfer",refund:"refund"};
 
 function fmt(n){return (Math.round(n*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+/* ============================================================
+   CUSTODY / RECEIVABLES CORE (Phase 3-a)
+   A party's liability balance = what YOU owe them.
+   receive: increases what you owe (toLiability portion only;
+            toIncome portion is YOUR income, not a liability).
+   spend:   decreases what you owe (settles the liability).
+   Sign convention for a party's running balance:
+     positive  => you owe the party (عليك)
+     negative  => the party owes you (لك)
+   Bank accounts & expense/income reports EXCLUDE custody rows.
+   ============================================================ */
+function custodyRows(party){
+  return ledger.filter(t=>t.type==='custody'&&(!party||t.party===party));
+}
+function partyBalance(party){
+  // running liability: + on receive(toLiability), - on spend(settled)
+  let bal=0;
+  custodyRows(party).forEach(t=>{
+    if(t.custodyKind==='receive')bal+=(parseFloat(t.toLiability)||0);
+    else if(t.custodyKind==='spend')bal-=(parseFloat(t.settled)||0); // 3-b will set settled; for now spend not built
+  });
+  return Math.round(bal*100)/100;
+}
+function partyDirLabel(bal){
+  if(Math.abs(bal)<0.005)return {txt:'مسوّاة',cls:'settled'};
+  if(bal>0)return {txt:'عليك',cls:'owe'};
+  return {txt:'لك',cls:'owed'};
+}
+function allParties(){
+  // union of stored names + any used in ledger
+  const s=new Set(PARTIES);
+  ledger.forEach(t=>{if(t.type==='custody'&&t.party)s.add(t.party);});
+  return [...s];
+}
+function addParty(name){
+  name=(name||'').trim();
+  if(name&&!PARTIES.includes(name)){PARTIES.push(name);saveState();}
+  return name;
+}
 
 function fillCatSelects(type){
   const main=$('edCatMain'), sub=$('edCatSub');
@@ -687,6 +855,7 @@ function renderBalances(){
   const accts={};
   ledger.forEach(t=>{
     if(t.isParent)return; // parent is a reference only; children carry the real amounts
+    if(t.type==='custody')return; // custody is isolated from bank balances
     const k=t.account||'—';
     if(!accts[k])accts[k]=0;
     if(t.type==='income'||t.type==='refund')accts[k]+=t.amount;
@@ -706,9 +875,9 @@ function renderBalances(){
 
 function renderLedger(){
   const L=$('ledger');
-  const realCount=ledger.filter(t=>!t.isParent).length;
+  const realCount=ledger.filter(t=>!t.isParent&&t.type!=='custody').length;
   $('countBadge').textContent=realCount+' عملية';
-  if(!ledger.length){L.innerHTML='<div class="empty" id="emptyState"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h18M3 12h18M3 17h12"/></svg><div>لا توجد عمليات بعد.<br>الصق رسالتك الأولى في الأعلى.</div></div>';renderBalances();return;}
+  if(!realCount){L.innerHTML='<div class="empty" id="emptyState"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h18M3 12h18M3 17h12"/></svg><div>لا توجد عمليات بعد.<br>الصق رسالتك الأولى في الأعلى.</div></div>';renderBalances();return;}
   L.innerHTML='';
   // Build display order: standalone rows and parent-groups, newest first by insertion.
   // Group children under their parent regardless of push order.
@@ -717,6 +886,7 @@ function renderLedger(){
   for(let i=ledger.length-1;i>=0;i--){
     const t=ledger[i];
     if(seen.has(i))continue;
+    if(t.type==='custody'){seen.add(i);continue;} // custody shown in its own panel
     if(t.isChild){
       // find its parent index
       const pIdx=ledger.findIndex(r=>r.isParent&&r.splitId===t.splitId);
@@ -806,6 +976,107 @@ function collectFromEdit(){
 
 function toast(msg){const t=$('toast');t.textContent=msg;t.className='toast show';setTimeout(()=>t.className='toast',1800);}
 
+/* ============================================================
+   CUSTODY UI (Phase 3-a)
+   ============================================================ */
+function renderCustody(){
+  const box=$('custList');
+  const parties=allParties().filter(p=>custodyRows(p).length);
+  if(!parties.length){box.innerHTML='<div class="cust-empty">لا توجد عُهد مسجّلة.<br>اضغط «+ استلام عهدة» لتسجيل أموال طرفٍ لديك.</div>';return;}
+  box.innerHTML='';
+  parties.forEach(p=>{
+    const bal=partyBalance(p);
+    const dir=partyDirLabel(bal);
+    const recv=custodyRows(p).filter(t=>t.custodyKind==='receive').length;
+    const row=document.createElement('div');row.className='cust-party-row';
+    row.innerHTML=`
+      <div class="cust-ava">${p.trim().charAt(0)}</div>
+      <div class="cust-mid">
+        <div class="cust-name">${p}</div>
+        <div class="cust-sub">${recv} استلام · اضغط للكشف</div>
+      </div>
+      <div class="cust-bal">
+        <div class="v">${fmt(Math.abs(bal))}</div>
+        <span class="d d-${dir.cls}">${dir.txt}</span>
+      </div>`;
+    row.onclick=()=>openStatement(p);
+    box.appendChild(row);
+  });
+}
+
+/* --- receive modal --- */
+function openCustModal(){
+  $('custParty').value='';$('custTotal').value='';$('custLiab').value='';$('custIncome').value='';$('custNote').value='';
+  const now=new Date();const pad=n=>String(n).padStart(2,'0');
+  $('custDate').value=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  $('custPartySuggest').className='party-suggest';
+  updateCustBalance();
+  $('custModal').className='modal-back show';
+}
+function closeCustModal(){$('custModal').className='modal-back';}
+function updateCustBalance(){
+  const total=parseFloat($('custTotal').value)||0;
+  const liab=parseFloat($('custLiab').value)||0;
+  const inc=parseFloat($('custIncome').value)||0;
+  const remain=Math.round((total-liab-inc)*100)/100;
+  const el=$('custBalance');$('custRemain').textContent=fmt(remain);
+  el.className='cust-balance '+(Math.abs(remain)<0.005&&total>0?'ok':'off');
+  return remain;
+}
+function renderPartySuggest(q){
+  const box=$('custPartySuggest');q=(q||'').trim();
+  const list=allParties();
+  const matches=q?list.filter(p=>p.includes(q)):list;
+  box.innerHTML='';
+  const exact=list.some(p=>p===q);
+  if(q&&!exact){const o=document.createElement('div');o.className='tag-opt';o.innerHTML=`<span>«${q}»</span><span class="new-badge">طرف جديد</span>`;o.onclick=()=>{$('custParty').value=q;box.className='party-suggest';};box.appendChild(o);}
+  matches.forEach(p=>{const o=document.createElement('div');o.className='tag-opt';o.textContent=p;o.onclick=()=>{$('custParty').value=p;box.className='party-suggest';};box.appendChild(o);});
+  box.className='party-suggest'+(box.children.length?' show':'');
+}
+function saveCustody(){
+  const party=addParty($('custParty').value);
+  if(!party){toast('حدّد الطرف أولاً');return;}
+  const total=parseFloat($('custTotal').value)||0;
+  if(total<=0){toast('أدخل المبلغ المستلَم');return;}
+  let liab=parseFloat($('custLiab').value)||0;
+  let inc=parseFloat($('custIncome').value)||0;
+  const remain=Math.round((total-liab-inc)*100)/100;
+  if(Math.abs(remain)>=0.005){toast('التوزيع لا يساوي المبلغ — المتبقّي '+fmt(remain));return;}
+  ledger.push({
+    type:'custody',party,custodyKind:'receive',
+    amount:total,toLiability:liab,toIncome:inc,
+    date:$('custDate').value,note:$('custNote').value.trim()
+  });
+  saveState();closeCustModal();renderCustody();renderLedger();
+  toast('تم تسجيل العهدة — '+party);
+}
+
+/* --- party statement --- */
+function openStatement(party){
+  $('stmtTitle').textContent='كشف حساب — '+party;
+  const bal=partyBalance(party);const dir=partyDirLabel(bal);
+  const rows=custodyRows(party).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  let html=`<div class="stmt-sum"><div class="v">${fmt(Math.abs(bal))}</div><span class="d d-${dir.cls}">${dir.txt}</span></div>`;
+  html+='<div style="margin-top:6px">';
+  let run=0;
+  rows.forEach(t=>{
+    const isRecv=t.custodyKind==='receive';
+    const liab=parseFloat(t.toLiability)||0;
+    run+=isRecv?liab:0;
+    const d=(t.date||'').replace('T',' ');
+    const incPart=(t.toIncome>0)?` · منها دخل لك ${fmt(t.toIncome)}`:'';
+    html+=`<div class="stmt-mv">
+      <div><div>استلام عهدة${t.note?(' — '+t.note):''}</div><div class="mv-l">${d}${incPart}</div></div>
+      <div class="mv-plus">+${fmt(liab)}</div>
+    </div>`;
+  });
+  html+='</div>';
+  html+='<div style="margin-top:12px;font-size:12px;color:var(--muted);background:var(--paper);padding:10px 12px;border-radius:9px">💡 الصرف من العهدة والتسوية (إطفاء الذمّة، ومعالجة الفائض) ستُضاف في التحديث القادم (المرحلة ٣-ب).</div>';
+  $('stmtBody').innerHTML=html;
+  $('stmtModal').className='modal-back show';
+}
+function closeStatement(){$('stmtModal').className='modal-back';}
+
 /* --- events --- */
 $('parseBtn').onclick=()=>{
   const txt=$('smsInput').value;
@@ -830,6 +1101,24 @@ $('splitAdd').onclick=()=>{
   renderSplit();
 };
 $('edAmount').addEventListener('input',()=>{if(splitMode){$('splitOrig').textContent=fmt(parseFloat($('edAmount').value)||0);updateBalance();}});
+
+/* custody events */
+$('custAddBtn').onclick=openCustModal;
+$('custClose').onclick=closeCustModal;
+$('custCancel').onclick=closeCustModal;
+$('custSave').onclick=saveCustody;
+$('custTotal').oninput=()=>updateCustBalance();
+$('custLiab').oninput=()=>updateCustBalance();
+$('custIncome').oninput=()=>updateCustBalance();
+$('custParty').onfocus=()=>renderPartySuggest($('custParty').value);
+$('custParty').oninput=()=>renderPartySuggest($('custParty').value);
+$('stmtClose').onclick=closeStatement;
+$('custModal').onclick=e=>{if(e.target===$('custModal'))closeCustModal();};
+$('stmtModal').onclick=e=>{if(e.target===$('stmtModal'))closeStatement();};
+// auto-fill liability with the full amount when total entered and split still empty
+$('custTotal').addEventListener('change',()=>{
+  if(!$('custLiab').value&&!$('custIncome').value){$('custLiab').value=$('custTotal').value;updateCustBalance();}
+});
 $('cancelBtn').onclick=()=>{$('preview').className='preview';$('smsInput').value='';current=null;closeSplit();splitItems=[];};
 $('saveBtn').onclick=()=>{
   if(!current){return;}
@@ -873,7 +1162,7 @@ $('saveBtn').onclick=()=>{
 $('exportBtn').onclick=()=>{
   if(!ledger.length){toast('لا توجد عمليات للتصدير');return;}
   const head=['التاريخ','نوع العملية','التصنيف الرئيسي','التصنيف الفرعي','الطرف','الحساب','المبلغ','الوسوم','مقسّمة','البنك'];
-  const rows=ledger.filter(t=>!t.isParent).map(t=>[t.date,TYPE_AR[t.type],t.catMain,t.catSub,t.party,t.account,t.amount,(t.tags||[]).join(' | '),t.isChild?'بند':'',t.bank]);
+  const rows=ledger.filter(t=>!t.isParent&&t.type!=='custody').map(t=>[t.date,TYPE_AR[t.type],t.catMain,t.catSub,t.party,t.account,t.amount,(t.tags||[]).join(' | '),t.isChild?'بند':'',t.bank]);
   let csv='\uFEFF'+head.join(',')+'\n'+rows.map(r=>r.map(c=>`"${String(c==null?'':c).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='masareef.csv';a.click();
@@ -969,6 +1258,7 @@ $('testBtn').onclick=()=>{
 /* --- INIT: load saved data first, then render --- */
 loadState();
 renderLedger();
+renderCustody();
 renderBackupBanner();
 
 /* --- PWA: register service worker for offline use --- */
